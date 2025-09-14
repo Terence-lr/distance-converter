@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Unit Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .converter-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .conversion-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .radio-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            margin: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .convert-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            margin-top: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .conversion-formula {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            border-left-color: #e74c3c;
+        }
+
+        @media (max-width: 600px) {
+            .converter-container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .conversion-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="converter-container">
+        <h1>Distance Converter</h1>
+        
+        <div class="input-group">
+            <label for="distance-input">Enter Distance:</label>
+            <input type="number" id="distance-input" placeholder="0" step="any">
+        </div>
+
+        <div class="conversion-selector">
+            <div class="radio-option">
+                <input type="radio" id="km-to-miles" name="conversion" value="km-to-miles" checked>
+                <label for="km-to-miles">Kilometers → Miles</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="miles-to-km" name="conversion" value="miles-to-km">
+                <label for="miles-to-km">Miles → Kilometers</label>
+            </div>
+        </div>
+
+        <button class="convert-btn" onclick="convertDistance()">Convert</button>
+
+        <div class="result" id="result">
+            <div class="result-text">Enter a distance and click Convert</div>
+        </div>
+    </div>
+
+    <script>
+        // Conversion constants
+        const KM_TO_MILES = 0.621371;
+        const MILES_TO_KM = 1.60934;
+
+        function convertDistance() {
+            const input = document.getElementById('distance-input');
+            const result = document.getElementById('result');
+            const selectedConversion = document.querySelector('input[name="conversion"]:checked').value;
+            
+            // Get input value
+            const inputValue = parseFloat(input.value);
+            
+            // Validate input
+            if (isNaN(inputValue) || inputValue < 0) {
+                result.innerHTML = '<div class="result-text error">Please enter a valid positive number</div>';
+                result.classList.add('error');
+                return;
+            }
+            
+            // Remove error class if it exists
+            result.classList.remove('error');
+            
+            let convertedValue, formula, fromUnit, toUnit;
+            
+            if (selectedConversion === 'km-to-miles') {
+                convertedValue = inputValue * KM_TO_MILES;
+                fromUnit = 'km';
+                toUnit = 'miles';
+                formula = `${inputValue} km × 0.621371 = ${convertedValue.toFixed(4)} miles`;
+            } else {
+                convertedValue = inputValue * MILES_TO_KM;
+                fromUnit = 'miles';
+                toUnit = 'km';
+                formula = `${inputValue} miles × 1.60934 = ${convertedValue.toFixed(4)} km`;
+            }
+            
+            // Display result
+            result.innerHTML = `
+                <div>
+                    <div class="result-text">
+                        ${inputValue} ${fromUnit} = ${convertedValue.toFixed(4)} ${toUnit}
+                    </div>
+                    <div class="conversion-formula">${formula}</div>
+                </div>
+            `;
+        }
+
+        // Allow conversion on Enter key press
+        document.getElementById('distance-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                convertDistance();
+            }
+        });
+
+        // Auto-convert when typing (with debounce)
+        let timeout;
+        document.getElementById('distance-input').addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (this.value !== '') {
+                    convertDistance();
+                }
+            }, 500);
+        });
+
+        // Convert when radio button changes
+        document.querySelectorAll('input[name="conversion"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const inputValue = document.getElementById('distance-input').value;
+                if (inputValue !== '') {
+                    convertDistance();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
